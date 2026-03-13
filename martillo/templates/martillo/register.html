@@ -1,0 +1,44 @@
+{% extends 'martillo/base.html' %}
+
+{% block title %}Registro - MartilloVirtualDjango{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 60px auto; background-color: rgba(255,255,255,0.05); padding: 40px; border-radius: 8px; border: 1px solid rgba(201, 168, 76, 0.2);">
+    <h2 style="text-align: center; margin-bottom: 30px;">Crear Cuenta</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; color: var(--dorado-antiguo); font-weight: 600;">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                    <small style="display: block; color: var(--gris-ceniza); margin-top: 5px; font-size: 0.85rem;">{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                    <p style="color: #ff5555; margin-top: 5px; font-size: 0.9rem;">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="pulsing-button" style="width: 100%; padding: 15px; margin-top: 20px;">Registrarse</button>
+    </form>
+    <p style="text-align: center; margin-top: 30px; color: var(--gris-ceniza);">
+        ¿Ya tienes cuenta? <a href="#" style="color: var(--dorado-antiguo); text-decoration: none;">Inicia sesión aquí</a>
+    </p>
+</div>
+
+<style>
+    input {
+        width: 100%;
+        padding: 12px;
+        background-color: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 4px;
+        color: white;
+        box-sizing: border-box;
+    }
+    input:focus {
+        border-color: var(--dorado-antiguo);
+        outline: none;
+    }
+</style>
+{% endblock %}

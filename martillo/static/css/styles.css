@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap');
+
+:root {
+    --negro-ebano: #1A1A2E;
+    --dorado-antiguo: #C9A84C;
+    --blanco-hueso: #F5F0E8;
+    --borgoña: #6B2D3E;
+    --gris-ceniza: #8C8C8C;
+}
+
+body {
+    background-color: var(--negro-ebano);
+    color: var(--blanco-hueso);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+    color: var(--dorado-antiguo);
+}
+
+.pulsing-button {
+    background-color: var(--dorado-antiguo);
+    color: var(--negro-ebano);
+    border: none;
+    padding: 10px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 0 0 0 rgba(201, 168, 76, 0.7);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(201, 168, 76, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(201, 168, 76, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(201, 168, 76, 0); }
+}
+
+.auction-card {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(201, 168, 76, 0.2);
+    border-radius: 8px;
+    padding: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.auction-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    border-color: var(--dorado-antiguo);
+}

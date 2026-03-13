@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MartilloVirtualDjango{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <header style="padding: 20px; border-bottom: 1px solid rgba(201, 168, 76, 0.3);">
+        <nav style="display: flex; justify-content: space-between; align-items: center;">
+            <a href="{% url 'home' %}" style="text-decoration: none;"><h1 style="margin: 0;">🔨 MARTILLO VIRTUAL</h1></a>
+            <div>
+                {% if user.is_authenticated %}
+                    <span>Bienvenido, {{ user.username }}</span>
+                {% else %}
+                    <a href="#" style="color: var(--dorado-antiguo); text-decoration: none;">Iniciar Sesión</a>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    <main style="max-width: 1200px; margin: 40px auto; padding: 0 20px;">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer style="text-align: center; padding: 40px; color: var(--gris-ceniza); border-top: 1px solid rgba(255,255,255,0.05);">
+        <p>&copy; 2026 MartilloVirtualDjango — Don Roberto & Cía.</p>
+    </footer>
+
+    <script src="{% static 'js/countdown.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

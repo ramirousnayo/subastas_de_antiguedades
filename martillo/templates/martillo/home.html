@@ -1,0 +1,38 @@
+{% extends 'martillo/base.html' %}
+{% load static %}
+
+{% block title %}Inicio - MartilloVirtualDjango{% endblock %}
+
+{% block content %}
+    <div style="text-align: center; margin-bottom: 60px;">
+        <h2 style="font-size: 3rem; margin-bottom: 10px;">Subastas Exclusivas</h2>
+        <p style="color: var(--gris-ceniza); font-size: 1.2rem;">Donde la tradición se encuentra con la emoción digital.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px;">
+        {% for subasta in subastas %}
+            <div class="auction-card">
+                {% if subasta.imagen %}
+                    <img src="{{ subasta.imagen.url }}" alt="{{ subasta.titulo }}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 4px; margin-bottom: 15px;">
+                {% else %}
+                    <div style="width: 100%; height: 200px; background-color: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; border-radius: 4px; margin-bottom: 15px;">
+                        <span style="color: var(--gris-ceniza);">Sin imagen</span>
+                    </div>
+                {% endif %}
+                <h3 style="margin-top: 0;">{{ subasta.titulo }}</h3>
+                <p style="color: var(--gris-ceniza); overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">{{ subasta.descripcion }}</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+                    <div>
+                        <small style="color: var(--gris-ceniza); display: block;">Precio Base</small>
+                        <span style="font-size: 1.2rem; color: var(--dorado-antiguo); font-weight: 600;">${{ subasta.precio_base }}</span>
+                    </div>
+                    <button class="pulsing-button">Ofertar</button>
+                </div>
+            </div>
+        {% empty %}
+            <div style="grid-column: 1 / -1; text-align: center; padding: 100px;">
+                <p style="color: var(--gris-ceniza);">No hay subastas activas en este momento. Vuelve pronto.</p>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
