@@ -28,6 +28,9 @@ class Subasta(models.Model):
     def __str__(self):
         return self.titulo
 
+    def obtener_oferta_mas_alta(self):
+        return self.oferta_set.order_by('-monto').first()
+
 
 class Oferta(models.Model):
     subasta = models.ForeignKey(Subasta, on_delete=models.CASCADE)
