@@ -1,0 +1,139 @@
+{% extends 'martillo/base.html' %}
+
+{% block title %}Publicar Pieza - MartilloVirtualDjango{% endblock %}
+
+{% block content %}
+<div style="max-width: 700px; margin: 60px auto; background-color: rgba(255,255,255,0.05); padding: 40px; border-radius: 12px; border: 1px solid rgba(201, 168, 76, 0.2); backdrop-filter: blur(10px); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);">
+    <h2 style="text-align: center; margin-bottom: 30px; color: var(--blanco-hueso); font-family: 'Playfair Display', serif;">Publicar una Nueva Pieza</h2>
+    <p style="text-align: center; color: var(--gris-ceniza); margin-bottom: 40px;">Comparte tu antigüedad con coleccionistas de todo Chile.</p>
+    
+    <form method="post" enctype="multipart/form-data" class="premium-form">
+        {% csrf_token %}
+        {% for field in form %}
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; margin-bottom: 8px; color: var(--dorado-antiguo); font-weight: 600; font-family: 'Inter', sans-serif;">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                    <small style="display: block; color: var(--gris-ceniza); margin-top: 5px; font-size: 0.85rem;">{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                    <p style="color: #ff5555; margin-top: 5px; font-size: 0.9rem; background: rgba(255,85,85,0.1); padding: 8px; border-radius: 4px; border-left: 3px solid #ff5555;">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="submit-button pulsing-button">Publicar Mágia</button>
+    </form>
+</div>
+
+<style>
+    /* Estilos Premium para el formulario */
+    .premium-form .form-control {
+        width: 100%;
+        padding: 14px 16px;
+        background-color: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 8px;
+        color: var(--blanco-hueso, #F5F0E8);
+        font-family: 'Inter', sans-serif;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    .premium-form .form-control:focus {
+        border-color: var(--dorado-antiguo, #C9A84C);
+        background-color: rgba(255, 255, 255, 0.12);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.2);
+    }
+    
+    .premium-form .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+    }
+
+    /* Estilos específicos para inputs de archivo */
+    .premium-form input[type="file"] {
+        padding: 10px;
+        background-color: rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+    }
+    
+    .premium-form input[type="file"]::file-selector-button {
+        background-color: var(--dorado-antiguo, #C9A84C);
+        color: var(--negro-ebano, #1A1A2E);
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 600;
+        margin-right: 15px;
+        transition: background-color 0.2s;
+    }
+    
+    .premium-form input[type="file"]::file-selector-button:hover {
+        background-color: #e0c266;
+    }
+
+    /* Estilo del botón principal */
+    .submit-button {
+        width: 100%;
+        padding: 16px;
+        margin-top: 30px;
+        background: linear-gradient(135deg, var(--dorado-antiguo, #C9A84C) 0%, #a68531 100%);
+        color: var(--negro-ebano, #1A1A2E);
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .submit-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(201, 168, 76, 0.4);
+    }
+    
+    .submit-button:active {
+        transform: translateY(1px);
+    }
+    
+    /* Animación de pulso definida (asumiendo que pulsing-button existe, pero la reforzamos) */
+    @keyframes pulse-custom {
+        0% { box-shadow: 0 0 0 0 rgba(201, 168, 76, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(201, 168, 76, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(201, 168, 76, 0); }
+    }
+    
+    .pulsing-button {
+        animation: pulse-custom 2s infinite;
+    }
+    
+    /* Selectores en webkit (chrome/safari) para date y datetime */
+    ::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+        opacity: 0.7;
+        cursor: pointer;
+    }
+    ::-webkit-calendar-picker-indicator:hover {
+        opacity: 1;
+    }
+</style>
+
+<script>
+    // Animación de entrada
+    document.addEventListener("DOMContentLoaded", function() {
+        const formContainer = document.querySelector('div[style*="max-width: 700px"]');
+        formContainer.style.opacity = '0';
+        formContainer.style.transform = 'translateY(20px)';
+        formContainer.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+        
+        setTimeout(() => {
+            formContainer.style.opacity = '1';
+            formContainer.style.transform = 'translateY(0)';
+        }, 100);
+    });
+</script>
+{% endblock %}
