@@ -5,10 +5,10 @@ Plataforma premium de subastas de antigüedades desarrollada para **Don Roberto*
 ## ✨ Características Principales
 
 - **Identidad Visual Premium**: Diseño elegante utilizando una paleta de colores Negro Ébano y Dorado Antiguo, con tipografía refinada (`Playfair Display` e `Inter`).
-- **Sistema de Subastas**: Gestión completa de piezas, categorías y ofertas en tiempo real.
-- **Perfiles de Usuario**: Registro de coleccionistas con sistema de reputación (compras y ventas).
-- **Interfaz Animada**: Botones con efecto pulso y tarjetas con elevación visual para una experiencia de lujo.
-- **Gestión de Multimedia**: Soporte para imágenes de alta calidad de las piezas de colección.
+- **Buscador y Filtrado Avanzado**: Motor de búsqueda por texto integrado con filtros por categoría (chips interactivos) y ordenamiento por urgencia o popularidad.
+- **Dashboard de Usuario**: Panel con estadísticas de vendedor (tasa de éxito) e historial completo de participaciones y subastas ganadas.
+- **Efectos WOW**: Tarjetas con rotación 3D en perspectiva, indicadores de actividad en tiempo real, animaciones de entrada y manejo elegante de errores (404/500).
+- **Sistema de Subastas**: Gestión completa de piezas, categorías y ofertas automáticas con cierre inteligente.
 
 ## 🛠️ Stack Tecnológico
 
