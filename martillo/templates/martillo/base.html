@@ -15,6 +15,7 @@
             <div style="display: flex; gap: 20px; align-items: center;">
                 {% if user.is_authenticated %}
                     <span style="color: var(--blanco-hueso);">Bienvenido, {{ user.username }}</span>
+                    <a href="{% url 'perfil' %}" class="btn btn-secondary" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--blanco-hueso); text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; font-size: 0.9rem; transition: all 0.3s; margin-left: 10px;">👤 Mi Perfil</a>
                     <a href="{% url 'publicar_pieza' %}" style="background-color: rgba(201, 168, 76, 0.2); border: 1px solid var(--dorado-antiguo); color: var(--dorado-antiguo); padding: 8px 16px; border-radius: 4px; text-decoration: none; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.backgroundColor='var(--dorado-antiguo)'; this.style.color='var(--negro-ebano)'" onmouseout="this.style.backgroundColor='rgba(201, 168, 76, 0.2)'; this.style.color='var(--dorado-antiguo)'">Publicar Pieza</a>
                     <form method="post" action="{% url 'logout' %}" style="margin: 0;">
                         {% csrf_token %}
