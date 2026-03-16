@@ -2,12 +2,19 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.utils import timezone
 from .models import Subasta, Oferta
 from .forms import UserRegistrationForm, SubastaForm, OfertaForm
 
 
 def home(request):
     subastas = Subasta.objects.all()
+    # Lazy closing for home view pieces
+    now = timezone.now()
+    for s in subastas:
+        if s.estado == 'ACTIVA' and s.fecha_cierre <= now:
+            s.cerrar_subasta()
+            
     return render(request, 'martillo/home.html', {
         'subastas': subastas
     })
@@ -41,6 +48,11 @@ def publicar_pieza(request):
 
 def detalle_subasta(request, subasta_id):
     subasta = get_object_or_404(Subasta, id=subasta_id)
+    
+    # Lazy closing
+    if subasta.estado == 'ACTIVA' and subasta.fecha_cierre <= timezone.now():
+        subasta.cerrar_subasta()
+        
     ofertas = subasta.oferta_set.all().order_by('-fecha')
     oferta_maxima = subasta.obtener_oferta_mas_alta()
     
@@ -71,4 +83,14 @@ def detalle_subasta(request, subasta_id):
         'ofertas': ofertas,
         'oferta_maxima': oferta_maxima,
         'form': form
+    })
+
+@login_required
+def perfil(request):
+    subastas_ganadas = Subasta.objects.filter(ganador=request.user)
+    subastas_publicadas = Subasta.objects.filter(vendedor=request.user)
+    
+    return render(request, 'martillo/perfil.html', {
+        'subastas_ganadas': subastas_ganadas,
+        'subastas_publicadas': subastas_publicadas,
     })

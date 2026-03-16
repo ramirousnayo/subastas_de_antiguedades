@@ -98,9 +98,22 @@
                         <a href="{% url 'login' %}?next={{ request.path }}" class="bid-button" style="text-decoration: none; display: block;">Inicia Sesión para Ofertar</a>
                     </div>
                 {% endif %}
+            {% elif subasta.estado == 'CERRADA' %}
+                <div style="padding: 30px; background: linear-gradient(135deg, rgba(201, 168, 76, 0.15) 0%, rgba(26, 26, 46, 0) 100%); border-radius: 12px; border: 1px solid var(--dorado-antiguo); text-align: center; animation: checkSuccess 0.6s ease-out;">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">🏆</div>
+                    <h3 style="color: var(--dorado-antiguo); margin-bottom: 10px; font-family: 'Playfair Display', serif;">Subasta Finalizada</h3>
+                    <p style="color: var(--blanco-hueso); font-size: 1.1rem; margin-bottom: 5px;">Ganador: <strong>{{ subasta.ganador.username }}</strong></p>
+                    <p style="color: var(--gris-ceniza);">Precio final: <span style="color: var(--dorado-antiguo); font-weight: 700;">${{ subasta.obtener_oferta_mas_alta.monto }}</span></p>
+                    {% if user == subasta.ganador %}
+                        <div style="margin-top: 20px; padding: 10px; background: var(--dorado-antiguo); color: var(--negro-ebano); border-radius: 6px; font-weight: 700;">
+                            ¡FELICIDADES! HAS GANADO ESTA PIEZA
+                        </div>
+                    {% endif %}
+                </div>
             {% else %}
-                <div style="padding: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; text-align: center;">
-                    <h3 style="color: var(--gris-ceniza); margin: 0;">SUBASTA FINALIZADA</h3>
+                <div style="padding: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; text-align: center; border: 1px solid rgba(255,255,255,0.1);">
+                    <h3 style="color: var(--gris-ceniza); margin-bottom: 5px;">SUBASTA DESIERTA</h3>
+                    <p style="color: var(--gris-ceniza); font-size: 0.9rem;">No se recibieron ofertas por esta pieza.</p>
                 </div>
             {% endif %}
             

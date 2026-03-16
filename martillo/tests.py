@@ -81,3 +81,49 @@ class OfertaFormTest(TestCase):
         form_data = {'monto': 110.00}
         form = OfertaForm(data=form_data, subasta=self.subasta)
         self.assertTrue(form.is_valid(), form.errors)
+
+
+class CierreSubastaTest(TestCase):
+
+    def setUp(self):
+        self.user_vendedor = User.objects.create_user(username='vendedor_cierre', password='password123')
+        self.user_comprador = User.objects.create_user(username='comprador_cierre', password='password123')
+        self.categoria = Categoria.objects.create(nombre="Cierre Cat")
+        
+        # Subasta que expirará
+        self.subasta = Subasta.objects.create(
+            titulo="Subasta a Cerrar",
+            descripcion="Desc",
+            precio_base=100.00,
+            fecha_cierre=timezone.now() - datetime.timedelta(hours=1), # Ya pasó
+            vendedor=self.user_vendedor,
+            categoria=self.categoria,
+            estado='ACTIVA'
+        )
+
+    def test_cierre_con_oferta_determina_ganador(self):
+        # Crear oferta de 150
+        Oferta.objects.create(subasta=self.subasta, usuario=self.user_comprador, monto=150.00)
+        
+        self.subasta.cerrar_subasta()
+        
+        self.assertEqual(self.subasta.estado, 'CERRADA')
+        self.assertEqual(self.subasta.ganador, self.user_comprador)
+
+    def test_cierre_sin_oferta_queda_desierta(self):
+        self.subasta.cerrar_subasta()
+        
+        self.assertEqual(self.subasta.estado, 'DESIERTA')
+        self.assertIsNone(self.subasta.ganador)
+
+    def test_comando_management_cierra_subastas(self):
+        from django.core.management import call_command
+        # Asegurarnos de que hay una oferta
+        Oferta.objects.create(subasta=self.subasta, usuario=self.user_comprador, monto=200.00)
+        
+        # Llamar al comando
+        call_command('cerrar_subastas')
+        
+        self.subasta.refresh_from_db()
+        self.assertEqual(self.subasta.estado, 'CERRADA')
+        self.assertEqual(self.subasta.ganador, self.user_comprador)

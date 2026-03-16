@@ -24,12 +24,26 @@ class Subasta(models.Model):
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
     imagen = models.ImageField(upload_to='subastas/', null=True, blank=True)
     estado = models.CharField(max_length=10, choices=ESTADO_CHOICES, default='ACTIVA')
+    ganador = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='subastas_ganadas')
 
     def __str__(self):
         return self.titulo
 
     def obtener_oferta_mas_alta(self):
         return self.oferta_set.order_by('-monto').first()
+
+    def cerrar_subasta(self):
+        if self.estado != 'ACTIVA':
+            return
+
+        oferta_maxima = self.obtener_oferta_mas_alta()
+        if oferta_maxima:
+            self.estado = 'CERRADA'
+            self.ganador = oferta_maxima.usuario
+        else:
+            self.estado = 'DESIERTA'
+        
+        self.save()
 
 
 class Oferta(models.Model):
