@@ -3,20 +3,45 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
-from .models import Subasta, Oferta
+from .models import Subasta, Oferta, Categoria
 from .forms import UserRegistrationForm, SubastaForm, OfertaForm
 
 
 def home(request):
     subastas = Subasta.objects.all()
-    # Lazy closing for home view pieces
+    # Lazy closing
     now = timezone.now()
     for s in subastas:
         if s.estado == 'ACTIVA' and s.fecha_cierre <= now:
             s.cerrar_subasta()
-            
+    
+    # Búsqueda
+    q = request.GET.get('q')
+    if q:
+        subastas = subastas.filter(titulo__icontains=q) | subastas.filter(descripcion__icontains=q)
+    
+    # Categoría
+    cat_id = request.GET.get('cat')
+    if cat_id:
+        subastas = subastas.filter(categoria_id=cat_id)
+        
+    # Ordenamiento (Efecto WOW: Novedades, Urgentes)
+    sort = request.GET.get('sort', 'novedad')
+    if sort == 'urgente':
+        subastas = subastas.filter(estado='ACTIVA').order_by('fecha_cierre')
+    elif sort == 'popular':
+        # Ordenar por cantidad de ofertas (necesita anotación)
+        from django.db.models import Count
+        subastas = subastas.annotate(num_ofertas=Count('oferta')).order_by('-num_ofertas')
+    else: # novedad
+        subastas = subastas.order_by('-id')
+
     return render(request, 'martillo/home.html', {
-        'subastas': subastas
+        'subastas': subastas,
+        'categorias': Categoria.objects.all(),
+        'q': q,
+        'current_cat': cat_id,
+        'current_sort': sort
     })
 
 
@@ -89,8 +114,21 @@ def detalle_subasta(request, subasta_id):
 def perfil(request):
     subastas_ganadas = Subasta.objects.filter(ganador=request.user)
     subastas_publicadas = Subasta.objects.filter(vendedor=request.user)
+    # HU-05: Subastas en las que participó (pujó)
+    subastas_participadas = Subasta.objects.filter(oferta__usuario=request.user).distinct()
+    
+    # HU-07: Estadísticas
+    total_publicadas = subastas_publicadas.count()
+    exitosas = subastas_publicadas.filter(estado='CERRADA').count()
+    tasa_exito = (exitosas / total_publicadas * 100) if total_publicadas > 0 else 0
     
     return render(request, 'martillo/perfil.html', {
         'subastas_ganadas': subastas_ganadas,
         'subastas_publicadas': subastas_publicadas,
+        'subastas_participadas': subastas_participadas,
+        'stats': {
+            'total': total_publicadas,
+            'exitosas': exitosas,
+            'tasa': round(tasa_exito, 1)
+        }
     })

@@ -1,0 +1,32 @@
+{% extends 'martillo/base.html' %}
+
+{% block title %}Iniciar Sesión - MartilloVirtualDjango{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 60px auto; background-color: rgba(255,255,255,0.05); padding: 40px; border-radius: 12px; border: 1px solid rgba(201, 168, 76, 0.2); backdrop-filter: blur(10px);">
+    <h2 style="text-align: center; margin-bottom: 30px; font-family: 'Playfair Display', serif; color: var(--blanco-hueso);">Iniciar Sesión</h2>
+    
+    {% if form.errors %}
+        <div style="padding: 15px; background-color: rgba(231, 76, 60, 0.1); border: 1px solid #e74c3c; border-radius: 6px; margin-bottom: 20px; color: #e74c3c; text-align: center;">
+            Tu nombre de usuario o contraseña son incorrectos. Por favor, inténtalo de nuevo.
+        </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 8px; color: var(--dorado-antiguo); font-weight: 600;">Usuario</label>
+            <input type="text" name="username" required style="width: 100%; padding: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: white;">
+        </div>
+        <div style="margin-bottom: 25px;">
+            <label style="display: block; margin-bottom: 8px; color: var(--dorado-antiguo); font-weight: 600;">Contraseña</label>
+            <input type="password" name="password" required style="width: 100%; padding: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: white;">
+        </div>
+        <button type="submit" class="pulsing-button" style="width: 100%; padding: 15px; background: linear-gradient(135deg, var(--dorado-antiguo) 0%, #a68531 100%); color: var(--negro-ebano); border: none; border-radius: 8px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">Entrar</button>
+    </form>
+    
+    <p style="text-align: center; margin-top: 30px; color: var(--gris-ceniza);">
+        ¿No tienes cuenta? <a href="{% url 'registro' %}" style="color: var(--dorado-antiguo); text-decoration: none; font-weight: 600;">Regístrate aquí</a>
+    </p>
+</div>
+{% endblock %}

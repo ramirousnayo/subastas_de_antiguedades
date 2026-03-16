@@ -1,0 +1,21 @@
+{% extends 'martillo/base.html' %}
+
+{% block title %}Página no encontrada - MartilloVirtual{% endblock %}
+
+{% block content %}
+<div style="text-align: center; margin: 100px auto; max-width: 600px; animation: fadeIn 0.8s ease-out;">
+    <div style="font-size: 6rem; color: var(--dorado-antiguo); font-family: 'Playfair Display', serif; margin-bottom: 20px;">404</div>
+    <h1 style="color: var(--blanco-hueso); margin-bottom: 20px;">Pieza Extraviada</h1>
+    <p style="color: var(--gris-ceniza); font-size: 1.2rem; margin-bottom: 40px;">
+        Lo sentimos, el lote que buscas no está disponible en nuestra galería en este momento.
+    </p>
+    <a href="{% url 'home' %}" class="btn-primary" style="display: inline-block; padding: 15px 30px; background: var(--dorado-antiguo); color: var(--negro-ebano); text-decoration: none; border-radius: 8px; font-weight: 700; text-transform: uppercase;">Volver al Inicio</a>
+</div>
+
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
