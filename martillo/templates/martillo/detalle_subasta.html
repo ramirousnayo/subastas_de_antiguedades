@@ -1,10 +1,205 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Detalle de Subasta - Martillo</title>
-</head>
-<body>
-    <h1>Detalle de la Subasta</h1>
-</body>
-</html>
+{% extends 'martillo/base.html' %}
+{% load static %}
+
+{% block title %}{{ subasta.titulo }} - MartilloVirtualDjango{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 20px;">
+    
+    <!-- Lado Izquierdo: Imagen e Información -->
+    <div style="animation: slideUp 0.6s ease-out;">
+        <div style="background-color: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden;">
+            {% if subasta.imagen %}
+                <img src="{{ subasta.imagen.url }}" alt="{{ subasta.titulo }}" style="width: 100%; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: transform 0.3s ease-out;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+            {% else %}
+                <div style="width: 100%; height: 400px; background-color: rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; border-radius: 8px;">
+                    <span style="color: var(--gris-ceniza);">Sin imagen disponible</span>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <h1 style="font-family: 'Playfair Display', serif; color: var(--blanco-hueso); font-size: 2.5rem; margin-bottom: 10px;">{{ subasta.titulo }}</h1>
+            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                <span style="background-color: var(--borgoña); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">{{ subasta.categoria }}</span>
+                <span style="border: 1px solid var(--dorado-antiguo); color: var(--dorado-antiguo); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">{{ subasta.get_estado_display }}</span>
+            </div>
+            <p style="color: var(--blanco-hueso); line-height: 1.8; font-size: 1.1rem; white-space: pre-wrap;">{{ subasta.descripcion }}</p>
+        </div>
+    </div>
+    
+    <!-- Lado Derecho: Ofertas y Puja -->
+    <div style="animation: slideUp 0.6s ease-out 0.2s; animation-fill-mode: both;">
+        <!-- Panel de Puja Principal (Glassmorphism) -->
+        <div style="background: rgba(255,255,255,0.03); backdrop-filter: blur(15px); border: 1px solid rgba(201, 168, 76, 0.3); border-radius: 16px; padding: 30px; position: sticky; top: 40px; box-shadow: 0 15px 35px rgba(0,0,0,0.3);">
+            
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;">
+                <div>
+                    <span style="color: var(--gris-ceniza); text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem;">Oferta Actual</span>
+                    <h2 style="color: var(--dorado-antiguo); font-size: 2.8rem; margin: 5px 0; font-weight: 700;">
+                        {% if oferta_maxima %}
+                            ${{ oferta_maxima.monto }}
+                        {% else %}
+                            ${{ subasta.precio_base }}
+                        {% endif %}
+                    </h2>
+                    <small style="color: var(--gris-ceniza);">
+                        {% if oferta_maxima %}
+                            De {{ oferta_maxima.usuario.username }}
+                        {% else %}
+                            Precio base inicial
+                        {% endif %}
+                    </small>
+                </div>
+                
+                <div style="text-align: right;">
+                    <span style="color: var(--gris-ceniza); text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem;">Cierra en</span>
+                    <div class="countdown-timer" data-date="{{ subasta.fecha_cierre|date:'c' }}" style="color: var(--blanco-hueso); font-size: 1.5rem; font-weight: 600; font-family: 'Inter', sans-serif; margin-top: 5px;">
+                        --:--:--
+                    </div>
+                </div>
+            </div>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div style="padding: 15px; border-radius: 8px; margin-bottom: 20px; 
+                         {% if message.tags == 'success' %}
+                            background-color: rgba(46, 204, 113, 0.15); border: 1px solid #2ecc71; color: #2ecc71;
+                            animation: checkSuccess 0.5s ease-out;
+                         {% else %}
+                            background-color: rgba(231, 76, 60, 0.15); border: 1px solid #e74c3c; color: #e74c3c;
+                         {% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            {% if subasta.estado == 'ACTIVA' %}
+                {% if user.is_authenticated %}
+                    {% if user != subasta.vendedor %}
+                        <form method="post" style="margin-top: 20px;">
+                            {% csrf_token %}
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; color: var(--blanco-hueso); margin-bottom: 10px; font-weight: 600;">Tu Oferta:</label>
+                                {{ form.monto }}
+                                {% for error in form.monto.errors %}
+                                    <p style="color: #e74c3c; font-size: 0.9rem; margin-top: 5px;">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                            <button type="submit" class="bid-button pulsing-button">Subir la Apuesta</button>
+                        </form>
+                    {% else %}
+                        <div style="padding: 20px; background: rgba(201, 168, 76, 0.1); border-radius: 8px; border: 1px dashed var(--dorado-antiguo); text-align: center;">
+                            <p style="color: var(--dorado-antiguo); margin: 0;">Eres el dueño de esta pieza. No puedes participar en el remate.</p>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div style="text-align: center; margin-top: 30px;">
+                        <a href="{% url 'login' %}?next={{ request.path }}" class="bid-button" style="text-decoration: none; display: block;">Inicia Sesión para Ofertar</a>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div style="padding: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; text-align: center;">
+                    <h3 style="color: var(--gris-ceniza); margin: 0;">SUBASTA FINALIZADA</h3>
+                </div>
+            {% endif %}
+            
+            <!-- Historial Reciente -->
+            <div style="margin-top: 40px;">
+                <h4 style="color: var(--blanco-hueso); margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">Historial de Pujas</h4>
+                <div style="max-height: 300px; overflow-y: auto; padding-right: 5px;" class="custom-scrollbar">
+                    {% for oferta in ofertas %}
+                        <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); animation: fadeIn 0.4s ease-out;">
+                            <div>
+                                <strong style="color: var(--blanco-hueso); display: block;">{{ oferta.usuario.username }}</strong>
+                                <small style="color: var(--gris-ceniza);">{{ oferta.fecha|date:"d M, H:i:s" }}</small>
+                            </div>
+                            <div style="color: var(--dorado-antiguo); font-weight: 700; font-size: 1.1rem;">
+                                ${{ oferta.monto }}
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p style="color: var(--gris-ceniza); text-align: center; padding: 20px;">Sé el primero en ofertar.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    @keyframes checkSuccess {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    .bid-button {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, var(--dorado-antiguo) 0%, #a68531 100%);
+        color: var(--negro-ebano);
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s;
+    }
+
+    .bid-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(201, 168, 76, 0.4);
+    }
+    
+    .pulsing-button {
+        animation: pulse-bid 2s infinite;
+    }
+    
+    @keyframes pulse-bid {
+        0% { box-shadow: 0 0 0 0 rgba(201, 168, 76, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(201, 168, 76, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(201, 168, 76, 0); }
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.15);
+        border-radius: 6px;
+        color: white;
+        font-size: 1.2rem;
+        text-align: center;
+    }
+    
+    .form-control:focus {
+        border-color: var(--dorado-antiguo);
+        outline: none;
+        background: rgba(255,255,255,0.12);
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(255,255,255,0.02);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: var(--dorado-antiguo);
+        border-radius: 5px;
+    }
+</style>
+{% endblock %}

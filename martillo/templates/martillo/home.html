@@ -12,21 +12,31 @@
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px;">
         {% for subasta in subastas %}
             <div class="auction-card">
-                {% if subasta.imagen %}
-                    <img src="{{ subasta.imagen.url }}" alt="{{ subasta.titulo }}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 4px; margin-bottom: 15px;">
-                {% else %}
-                    <div style="width: 100%; height: 200px; background-color: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; border-radius: 4px; margin-bottom: 15px;">
-                        <span style="color: var(--gris-ceniza);">Sin imagen</span>
-                    </div>
-                {% endif %}
-                <h3 style="margin-top: 0;">{{ subasta.titulo }}</h3>
-                <p style="color: var(--gris-ceniza); overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">{{ subasta.descripcion }}</p>
+                <a href="{% url 'detalle_subasta' subasta.id %}" style="text-decoration: none; color: inherit;">
+                    {% if subasta.imagen %}
+                        <img src="{{ subasta.imagen.url }}" alt="{{ subasta.titulo }}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 4px; margin-bottom: 15px;">
+                    {% else %}
+                        <div style="width: 100%; height: 200px; background-color: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; border-radius: 4px; margin-bottom: 15px;">
+                            <span style="color: var(--gris-ceniza);">Sin imagen</span>
+                        </div>
+                    {% endif %}
+                    <h3 style="margin-top: 0; color: var(--blanco-hueso);">{{ subasta.titulo }}</h3>
+                </a>
+                <p style="color: var(--gris-ceniza); overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-clamp: 2;">{{ subasta.descripcion }}</p>
+                
+                <div style="margin: 15px 0; padding: 10px; background: rgba(0,0,0,0.1); border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: var(--gris-ceniza); font-size: 0.8rem;">Cierra en:</span>
+                    <span class="countdown-timer" data-date="{{ subasta.fecha_cierre|date:'c' }}" style="color: var(--dorado-antiguo); font-weight: 600;">--:--:--</span>
+                </div>
+
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
                     <div>
-                        <small style="color: var(--gris-ceniza); display: block;">Precio Base</small>
-                        <span style="font-size: 1.2rem; color: var(--dorado-antiguo); font-weight: 600;">${{ subasta.precio_base }}</span>
+                        <small style="color: var(--gris-ceniza); display: block;">Oferta Actual</small>
+                        <span style="font-size: 1.2rem; color: var(--dorado-antiguo); font-weight: 600;">
+                            ${% with max_bid=subasta.obtener_oferta_mas_alta %}{% if max_bid %}{{ max_bid.monto }}{% else %}{{ subasta.precio_base }}{% endif %}{% endwith %}
+                        </span>
                     </div>
-                    <button class="pulsing-button">Ofertar</button>
+                    <a href="{% url 'detalle_subasta' subasta.id %}" class="pulsing-button" style="text-decoration: none; padding: 10px 20px; font-size: 0.9rem;">Ofertar</a>
                 </div>
             </div>
         {% empty %}
