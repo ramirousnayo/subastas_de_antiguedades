@@ -4,45 +4,158 @@
 {% block title %}Inicio - MartilloVirtualDjango{% endblock %}
 
 {% block content %}
-    <div style="text-align: center; margin-bottom: 60px;">
-        <h2 style="font-size: 3rem; margin-bottom: 10px;">Subastas Exclusivas</h2>
-        <p style="color: var(--gris-ceniza); font-size: 1.2rem;">Donde la tradición se encuentra con la emoción digital.</p>
+<!-- Hero Section con Buscador (Efecto WOW) -->
+<div style="background: linear-gradient(135deg, rgba(26,26,46,0.95) 0%, rgba(107,45,62,0.2) 100%), url('https://images.unsplash.com/photo-1579546673283-49a8c3c5dfe0?auto=format&fit=crop&q=80&w=1200'); background-size: cover; background-position: center; padding: 80px 40px; border-radius: 24px; border: 1px solid rgba(201, 168, 76, 0.2); margin-bottom: 50px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); text-align: center; position: relative; overflow: hidden;">
+    <div style="position: relative; z-index: 2;">
+        <h2 style="font-family: 'Playfair Display', serif; color: var(--blanco-hueso); font-size: 3.5rem; margin-bottom: 20px; letter-spacing: -1px;">Tesoros con Historia</h2>
+        <p style="color: rgba(245, 240, 232, 0.8); font-size: 1.2rem; margin-bottom: 40px; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.6;">
+            Subastas exclusivas de piezas únicas para coleccionistas exigentes.
+        </p>
+        
+        <form action="{% url 'home' %}" method="get" style="max-width: 700px; margin: 0 auto; display: flex; gap: 10px; background: rgba(255,255,255,0.07); padding: 10px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(20px); box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+            <div style="flex: 1; display: flex; align-items: center; padding-left: 15px;">
+                <span style="font-size: 1.2rem;">🔍</span>
+                <input type="text" name="q" placeholder="¿Qué estás buscando hoy?" value="{{ q|default:'' }}" style="width: 100%; background: transparent; border: none; padding: 12px 15px; color: white; font-size: 1.1rem; outline: none; font-family: 'Inter', sans-serif;">
+            </div>
+            <button type="submit" style="background: var(--dorado-antiguo); color: var(--negro-ebano); border: none; padding: 0 35px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; font-family: 'Inter', sans-serif; text-transform: uppercase; letter-spacing: 1px;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 15px rgba(201, 168, 76, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">Explorar</button>
+        </form>
     </div>
+</div>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px;">
-        {% for subasta in subastas %}
-            <div class="auction-card">
-                <a href="{% url 'detalle_subasta' subasta.id %}" style="text-decoration: none; color: inherit;">
-                    {% if subasta.imagen %}
-                        <img src="{{ subasta.imagen.url }}" alt="{{ subasta.titulo }}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 4px; margin-bottom: 15px;">
-                    {% else %}
-                        <div style="width: 100%; height: 200px; background-color: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; border-radius: 4px; margin-bottom: 15px;">
-                            <span style="color: var(--gris-ceniza);">Sin imagen</span>
-                        </div>
-                    {% endif %}
-                    <h3 style="margin-top: 0; color: var(--blanco-hueso);">{{ subasta.titulo }}</h3>
-                </a>
-                <p style="color: var(--gris-ceniza); overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-clamp: 2;">{{ subasta.descripcion }}</p>
-                
-                <div style="margin: 15px 0; padding: 10px; background: rgba(0,0,0,0.1); border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
-                    <span style="color: var(--gris-ceniza); font-size: 0.8rem;">Cierra en:</span>
-                    <span class="countdown-timer" data-date="{{ subasta.fecha_cierre|date:'c' }}" style="color: var(--dorado-antiguo); font-weight: 600;">--:--:--</span>
-                </div>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
-                    <div>
-                        <small style="color: var(--gris-ceniza); display: block;">Oferta Actual</small>
-                        <span style="font-size: 1.2rem; color: var(--dorado-antiguo); font-weight: 600;">
-                            ${% with max_bid=subasta.obtener_oferta_mas_alta %}{% if max_bid %}{{ max_bid.monto }}{% else %}{{ subasta.precio_base }}{% endif %}{% endwith %}
-                        </span>
-                    </div>
-                    <a href="{% url 'detalle_subasta' subasta.id %}" class="pulsing-button" style="text-decoration: none; padding: 10px 20px; font-size: 0.9rem;">Ofertar</a>
-                </div>
-            </div>
-        {% empty %}
-            <div style="grid-column: 1 / -1; text-align: center; padding: 100px;">
-                <p style="color: var(--gris-ceniza);">No hay subastas activas en este momento. Vuelve pronto.</p>
-            </div>
+<!-- Filtros y Categorías -->
+<div style="margin-bottom: 50px; animation: fadeIn 1s ease-out;">
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-bottom: 30px;">
+        <a href="{% url 'home' %}" style="text-decoration: none; padding: 10px 24px; border-radius: 30px; border: 1px solid {% if not current_cat %}var(--dorado-antiguo){% else %}rgba(255,255,255,0.1){% endif %}; background: {% if not current_cat %}var(--dorado-antiguo){% else %}rgba(255,255,255,0.03){% endif %}; color: {% if not current_cat %}var(--negro-ebano){% else %}var(--gris-ceniza){% endif %}; font-weight: 600; font-size: 0.9rem; transition: all 0.3s; transform: scale({% if not current_cat %}1.05{% else %}1{% endif %});">Todas las Piezas</a>
+        {% for cat in categorias %}
+            <a href="?cat={{ cat.id }}{% if q %}&q={{ q }}{% endif %}" style="text-decoration: none; padding: 10px 24px; border-radius: 30px; border: 1px solid {% if current_cat == cat.id|stringformat:'s' %}var(--dorado-antiguo){% else %}rgba(255,255,255,0.1){% endif %}; background: {% if current_cat == cat.id|stringformat:'s' %}var(--dorado-antiguo){% else %}rgba(255,255,255,0.03){% endif %}; color: {% if current_cat == cat.id|stringformat:'s' %}var(--negro-ebano){% else %}var(--gris-ceniza){% endif %}; font-weight: 600; font-size: 0.9rem; transition: all 0.3s; transform: scale({% if current_cat == cat.id|stringformat:'s' %}1.05{% else %}1{% endif %});" onmouseover="this.style.borderColor='var(--dorado-antiguo)'; this.style.color='var(--blanco-hueso)'" onmouseout="if('{{current_cat}}' != '{{cat.id}}') { this.style.borderColor='rgba(255,255,255,0.1)'; this.style.color='var(--gris-ceniza)' }">
+                {{ cat.nombre }}
+            </a>
         {% endfor %}
     </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+        <h3 style="font-family: 'Playfair Display', serif; color: var(--blanco-hueso); margin: 0; font-weight: 400;">
+            Mostrando <span style="color: var(--dorado-antiguo); font-weight: 700;">{{ subastas.count }}</span> lotes disponibles
+        </h3>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <span style="color: var(--gris-ceniza); font-size: 0.85rem;">Ordenar por:</span>
+            <select onchange="window.location.href='?sort='+this.value+'{% if q %}&q={{ q }}{% endif %}{% if current_cat %}&cat={{ current_cat }}{% endif %}'" style="background: #1a1a2e; color: var(--blanco-hueso); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 10px 15px; outline: none; cursor: pointer; font-family: 'Inter', sans-serif;">
+                <option value="novedad" {% if current_sort == 'novedad' %}selected{% endif %}>Recientes</option>
+                <option value="urgente" {% if current_sort == 'urgente' %}selected{% endif %}>Cerrando Pronto</option>
+                <option value="popular" {% if current_sort == 'popular' %}selected{% endif %}>Más Populares</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="auction-grid">
+    {% for subasta in subastas %}
+        <div class="auction-card" style="animation: slideUp 0.6s ease-out forwards; opacity: 0; animation-delay: calc({{ forloop.counter0 }} * 0.1s);">
+            <a href="{% url 'detalle_subasta' subasta.id %}" style="text-decoration: none; color: inherit;">
+                <div style="position: relative; overflow: hidden; border-radius: 12px 12px 0 0;">
+                    {% if subasta.imagen %}
+                        <img src="{{ subasta.imagen.url }}" alt="{{ subasta.titulo }}" style="width: 100%; height: 240px; object-fit: cover; transition: transform 0.5s ease;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                    {% else %}
+                        <div style="width: 100%; height: 240px; background: #2a2a40; display: flex; align-items: center; justify-content: center; font-size: 3rem;">🖼️</div>
+                    {% endif %}
+                    
+                    <!-- Badge de Categoría -->
+                    <div style="position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); color: var(--blanco-hueso); padding: 4px 12px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; border: 1px solid rgba(255,255,255,0.1);">
+                        {{ subasta.categoria.nombre }}
+                    </div>
+
+                    {% if subasta.estado != 'ACTIVA' %}
+                        <div style="position: absolute; inset: 0; background: rgba(26,26,46,0.7); display: flex; align-items: center; justify-content: center;">
+                            <span style="background: var(--borgoña); color: white; padding: 8px 20px; border-radius: 4px; font-weight: 700; transform: rotate(-5deg); box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.2);">
+                                {{ subasta.get_estado_display }}
+                            </span>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div style="padding: 25px;">
+                    <h3 style="font-family: 'Playfair Display', serif; margin: 0 0 12px 0; font-size: 1.4rem; line-height: 1.2; color: var(--blanco-hueso);">{{ subasta.titulo }}</h3>
+                    <p style="color: var(--gris-ceniza); font-size: 0.95rem; line-height: 1.5; height: 45px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-bottom: 25px;">
+                        {{ subasta.descripcion }}
+                    </p>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; margin-top: 10px;">
+                        <div>
+                            <span style="color: var(--gris-ceniza); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600;">Puja Actual</span>
+                            <p style="color: var(--dorado-antiguo); font-size: 1.6rem; font-weight: 800; margin: 2px 0 0 0;">
+                                ${{ subasta.obtener_oferta_mas_alta.monto|default:subasta.precio_base|floatformat:0 }}
+                            </p>
+                        </div>
+                        
+                        <div style="text-align: right;">
+                            <div class="countdown-timer" data-date="{{ subasta.fecha_cierre|date:'c' }}" style="color: var(--blanco-hueso); font-family: 'Inter', monospace; font-size: 0.85rem; font-weight: 600; background: rgba(201, 168, 76, 0.1); padding: 4px 10px; border-radius: 4px; border: 1px solid rgba(201, 168, 76, 0.2);">
+                                --:--:--
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    {% empty %}
+        <div style="grid-column: 1 / -1; text-align: center; padding: 80px 40px; background: rgba(255,255,255,0.01); border-radius: 24px; border: 1px dashed rgba(255,255,255,0.1);">
+            <div style="font-size: 5rem; margin-bottom: 30px; filter: grayscale(1); opacity: 0.5;">🏺</div>
+            <h3 style="font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--blanco-hueso); margin-bottom: 15px;">Sin resultados encontrados</h3>
+            <p style="color: var(--gris-ceniza); font-size: 1.1rem; max-width: 500px; margin: 0 auto 30px auto;">
+                No hemos podido encontrar piezas que coincidan con tu búsqueda. Intenta con otros términos o explora nuestras categorías.
+            </p>
+            <a href="{% url 'home' %}" style="color: var(--dorado-antiguo); text-decoration: none; font-weight: 700; border-bottom: 2px solid var(--dorado-antiguo); padding-bottom: 5px; transition: all 0.3s;" onmouseover="this.style.letterSpacing='1px'" onmouseout="this.style.letterSpacing='0'">VER TODO EL CATÁLOGO</a>
+        </div>
+    {% endfor %}
+</div>
+
+<style>
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    .auction-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 35px;
+        perspective: 1000px;
+    }
+    .auction-card {
+        background: rgba(255,255,255,0.03);
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.05);
+        transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        transform-style: preserve-3d;
+        position: relative;
+    }
+    .auction-card:hover {
+        transform: translateY(-10px) rotateX(2deg) rotateY(1deg);
+        background: rgba(255,255,255,0.06);
+        border-color: rgba(201, 168, 76, 0.4);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 20px rgba(201, 168, 76, 0.1);
+    }
+    .auction-card::after {
+        content: "🔥 {{ subasta.oferta_set.count|add:3 }} coleccionistas viendo esto";
+        position: absolute;
+        bottom: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.7rem;
+        color: var(--dorado-antiguo);
+        opacity: 0;
+        transition: all 0.3s;
+        pointer-events: none;
+        white-space: nowrap;
+        background: rgba(0,0,0,0.8);
+        padding: 4px 12px;
+        border-radius: 20px;
+    }
+    .auction-card:hover::after {
+        opacity: 1;
+        bottom: 10px;
+    }
+</style>
 {% endblock %}
