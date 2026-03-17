@@ -8,37 +8,30 @@ from .forms import UserRegistrationForm, SubastaForm, OfertaForm
 
 
 def home(request):
-    subastas = Subasta.objects.all()
-    # Lazy closing
-    now = timezone.now()
-    for s in subastas:
-        if s.estado == 'ACTIVA' and s.fecha_cierre <= now:
-            s.cerrar_subasta()
+    # Lazy closing centralizado
+    Subasta.objects.cerrar_expiradas()
     
-    # Búsqueda
+    # Parámetros de filtrado
     q = request.GET.get('q')
-    if q:
-        subastas = subastas.filter(titulo__icontains=q) | subastas.filter(descripcion__icontains=q)
-    
-    # Categoría
     cat_id = request.GET.get('cat')
-    if cat_id:
-        subastas = subastas.filter(categoria_id=cat_id)
-        
-    # Ordenamiento (Efecto WOW: Novedades, Urgentes)
     sort = request.GET.get('sort', 'novedad')
+
+    # QuerySet base optimizado con select_related
+    subastas = Subasta.objects.select_related('categoria').all()
+    
+    # Aplicar filtros usando el QuerySet personalizado
+    subastas = subastas.buscar(q).por_categoria(cat_id)
+        
+    # Aplicar ordenamiento
     if sort == 'urgente':
-        subastas = subastas.filter(estado='ACTIVA').order_by('fecha_cierre')
+        subastas = subastas.urgentes()
     elif sort == 'popular':
-        # Ordenar por cantidad de ofertas (necesita anotación)
-        from django.db.models import Count
-        subastas = subastas.annotate(num_ofertas=Count('oferta')).order_by('-num_ofertas')
+        subastas = subastas.populares()
     else: # novedad
-        subastas = subastas.order_by('-id')
+        subastas = subastas.novedades()
 
     return render(request, 'martillo/home.html', {
         'subastas': subastas,
-        'categorias': Categoria.objects.all(),
         'q': q,
         'current_cat': cat_id,
         'current_sort': sort
@@ -77,6 +70,8 @@ def detalle_subasta(request, subasta_id):
     # Lazy closing
     if subasta.estado == 'ACTIVA' and subasta.fecha_cierre <= timezone.now():
         subasta.cerrar_subasta()
+        # Refrescamos la instancia por si cambió a CERRADA/DESIERTA
+        subasta.refresh_from_db()
         
     ofertas = subasta.oferta_set.all().order_by('-fecha')
     oferta_maxima = subasta.obtener_oferta_mas_alta()
@@ -112,10 +107,11 @@ def detalle_subasta(request, subasta_id):
 
 @login_required
 def perfil(request):
-    subastas_ganadas = Subasta.objects.filter(ganador=request.user)
-    subastas_publicadas = Subasta.objects.filter(vendedor=request.user)
+    # Optimizamos con select_related donde aplique
+    subastas_ganadas = Subasta.objects.filter(ganador=request.user).select_related('categoria')
+    subastas_publicadas = Subasta.objects.filter(vendedor=request.user).select_related('categoria')
     # HU-05: Subastas en las que participó (pujó)
-    subastas_participadas = Subasta.objects.filter(oferta__usuario=request.user).distinct()
+    subastas_participadas = Subasta.objects.filter(oferta__usuario=request.user).select_related('categoria').distinct()
     
     # HU-07: Estadísticas
     total_publicadas = subastas_publicadas.count()
