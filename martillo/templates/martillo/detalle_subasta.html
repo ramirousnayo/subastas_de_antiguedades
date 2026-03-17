@@ -1,5 +1,5 @@
 {% extends 'martillo/base.html' %}
-{% load static %}
+{% load static humanize martillo_filters %}
 
 {% block title %}{{ subasta.titulo }} - MartilloVirtualDjango{% endblock %}
 
@@ -38,9 +38,9 @@
                     <span style="color: var(--gris-ceniza); text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem;">Oferta Actual</span>
                     <h2 style="color: var(--dorado-antiguo); font-size: 2.8rem; margin: 5px 0; font-weight: 700;">
                         {% if oferta_maxima %}
-                            ${{ oferta_maxima.monto }}
+                            $ {{ oferta_maxima.monto|clp }}
                         {% else %}
-                            ${{ subasta.precio_base }}
+                            $ {{ subasta.precio_base|clp }}
                         {% endif %}
                     </h2>
                     <small style="color: var(--gris-ceniza);">
@@ -95,7 +95,7 @@
                     <div style="font-size: 3rem; margin-bottom: 10px;">🏆</div>
                     <h3 style="color: var(--dorado-antiguo); margin-bottom: 10px; font-family: 'Playfair Display', serif;">Subasta Finalizada</h3>
                     <p style="color: var(--blanco-hueso); font-size: 1.1rem; margin-bottom: 5px;">Ganador: <strong>{{ subasta.ganador.username }}</strong></p>
-                    <p style="color: var(--gris-ceniza);">Precio final: <span style="color: var(--dorado-antiguo); font-weight: 700;">${{ subasta.obtener_oferta_mas_alta.monto }}</span></p>
+                    <p style="color: var(--gris-ceniza);">Precio final: <span style="color: var(--dorado-antiguo); font-weight: 700;">$ {{ subasta.obtener_oferta_mas_alta.monto|clp }}</span></p>
                     {% if user == subasta.ganador %}
                         <div style="margin-top: 20px; padding: 10px; background: var(--dorado-antiguo); color: var(--negro-ebano); border-radius: 6px; font-weight: 700;">
                             ¡FELICIDADES! HAS GANADO ESTA PIEZA
@@ -120,7 +120,7 @@
                                 <small style="color: var(--gris-ceniza);">{{ oferta.fecha|date:"d M, H:i:s" }}</small>
                             </div>
                             <div style="color: var(--dorado-antiguo); font-weight: 700; font-size: 1.1rem;">
-                                ${{ oferta.monto }}
+                                $ {{ oferta.monto|clp }}
                             </div>
                         </div>
                     {% empty %}
