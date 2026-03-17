@@ -22,6 +22,8 @@ Plataforma premium de subastas de antigüedades desarrollada para **Don Roberto*
 - **Custom Managers**: Centralización de la lógica de "Lazy Closing" y filtrado complejo en el modelo `Subasta`.
 - **Global Context**: Listado de categorías disponible en todos los templates mediante un `context_processor` personalizado, reduciendo redundancia en las vistas.
 - **Optimización de Consultas**: Uso preventivo de `select_related` en vistas de alta concurrencia para minimizar accesos a disco.
+- **Formato de Moneda Localizado**: Implementación de un filtro personalizado `|clp` para forzar separadores de miles con punto (`.`) y supresión de decimales, garantizando un formato profesional acorde al mercado chileno.
+- **Configuración Regional Robusta**: Soporte para formatos personalizados mediante `FORMAT_MODULE_PATH` para la región `es-cl`.
 
 ## 🚀 Instalación y Ejecución
 
@@ -61,6 +63,8 @@ Accede a `http://127.0.0.1:8000/` para ver la plataforma.
     - `models.py`: Modelos con Managers personalizados.
     - `views.py`: Controladores optimizados.
     - `context_processors.py`: Lógica inyectable globalmente.
+    - `templatetags/`: Filtros personalizados (`clp`) para formato de moneda.
+    - `formats/`: Overrides de configuración regional (CLP).
 - `media/`: Almacenamiento local de piezas.
 - `static/`: Identidad visual y scripts de interacción.
 

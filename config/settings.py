@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'martillo.apps.MartilloConfig',
 ]
 
@@ -120,6 +121,12 @@ TIME_ZONE = 'America/Santiago'
 USE_I18N = True
 
 USE_TZ = True
+
+USE_THOUSAND_SEPARATOR = True
+
+FORMAT_MODULE_PATH = [
+    'martillo.formats',
+]
 
 
 # Static files (CSS, JavaScript, Images)

@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db.models import Max, Q
 from django.utils import timezone
 from .models import Subasta, Oferta, Categoria
 from .forms import UserRegistrationForm, SubastaForm, OfertaForm
@@ -107,11 +108,19 @@ def detalle_subasta(request, subasta_id):
 
 @login_required
 def perfil(request):
-    # Optimizamos con select_related donde aplique
+    # Optimizamos con select_related y annotations
     subastas_ganadas = Subasta.objects.filter(ganador=request.user).select_related('categoria')
-    subastas_publicadas = Subasta.objects.filter(vendedor=request.user).select_related('categoria')
-    # HU-05: Subastas en las que participó (pujó)
-    subastas_participadas = Subasta.objects.filter(oferta__usuario=request.user).select_related('categoria').distinct()
+    
+    # Subastas publicadas por el usuario, con la puja más alta actual
+    subastas_publicadas = Subasta.objects.filter(vendedor=request.user)\
+        .select_related('categoria')\
+        .annotate(puja_actual=Max('oferta__monto'))
+        
+    # HU-05: Subastas en las que participó, con su puja más alta personal
+    subastas_participadas = Subasta.objects.filter(oferta__usuario=request.user)\
+        .select_related('categoria')\
+        .annotate(mi_puja_max=Max('oferta__monto', filter=Q(oferta__usuario=request.user)))\
+        .distinct()
     
     # HU-07: Estadísticas
     total_publicadas = subastas_publicadas.count()
