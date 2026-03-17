@@ -1,5 +1,42 @@
 from django.db import models
+from django.db.models import Count, Q
 from django.contrib.auth.models import User
+from django.utils import timezone
+
+
+class SubastaQuerySet(models.QuerySet):
+    def activas(self):
+        return self.filter(estado='ACTIVA')
+
+    def buscar(self, query):
+        if not query:
+            return self
+        return self.filter(Q(titulo__icontains=query) | Q(descripcion__icontains=query))
+
+    def por_categoria(self, categoria_id):
+        if not categoria_id:
+            return self
+        return self.filter(categoria_id=categoria_id)
+
+    def populares(self):
+        return self.annotate(num_ofertas=Count('oferta')).order_by('-num_ofertas')
+
+    def urgentes(self):
+        return self.activas().order_by('fecha_cierre')
+
+    def novedades(self):
+        return self.order_by('-id')
+
+
+class SubastaManager(models.Manager):
+    def get_queryset(self):
+        return SubastaQuerySet(self.model, using=self._db)
+
+    def cerrar_expiradas(self):
+        now = timezone.now()
+        expiradas = self.get_queryset().activas().filter(fecha_cierre__lte=now)
+        for subasta in expiradas:
+            subasta.cerrar_subasta()
 
 
 class Categoria(models.Model):
@@ -25,6 +62,8 @@ class Subasta(models.Model):
     imagen = models.ImageField(upload_to='subastas/', null=True, blank=True)
     estado = models.CharField(max_length=10, choices=ESTADO_CHOICES, default='ACTIVA')
     ganador = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='subastas_ganadas')
+
+    objects = SubastaManager()
 
     def __str__(self):
         return self.titulo

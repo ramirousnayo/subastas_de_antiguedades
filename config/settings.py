@@ -25,7 +25,13 @@ SECRET_KEY = 'django-insecure-npfhz$th@0$xbp7_mxj_jkq%-&3wqhr5o5q^b7k1&*zei+9@p=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+
+# Confianza para CSRF en entornos de desarrollo local
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+]
 
 
 # Application definition
@@ -62,6 +68,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'martillo.context_processors.categorias',
             ],
         },
     },
