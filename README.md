@@ -41,7 +41,7 @@ Plataforma premium de subastas de antigüedades desarrollada para **Don Roberto*
 
 3. **Instalar dependencias**:
    ```bash
-   pip install django Pillow
+   pip install -r requirements.txt
    ```
 
 4. **Aplicar migraciones**:
